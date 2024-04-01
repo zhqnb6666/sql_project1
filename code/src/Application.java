@@ -46,7 +46,6 @@ public class Application {
             openDB(loadDBUser());
             conn.setAutoCommit(false); // Start transaction
 
-            // Assuming JSON files are stored in a known directory
             String jsonDirectoryPath = "resources/";
             LinesTableLoader.clearLinesTable(conn);
             StationsTableLoader.clearStationsTable(conn);

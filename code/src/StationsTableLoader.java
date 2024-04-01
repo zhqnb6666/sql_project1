@@ -13,7 +13,6 @@ public class StationsTableLoader {
     public static void clearStationsTable(Connection con) {
         if (con != null) {
             try (Statement stmt = con.createStatement()) {
-                // Drop the existing stations table if it exists
                 stmt.executeUpdate("DROP TABLE IF EXISTS stations CASCADE;");
                 con.commit();
 
@@ -39,8 +38,6 @@ public class StationsTableLoader {
     }
 
     public static void clearBusesTable(Connection con) throws SQLException {
-        // Assuming CASCADE on stations table will automatically clear related bus entries.
-        // If not, you should explicitly drop and recreate the buses table here.
         try (Statement stmt = con.createStatement()) {
             stmt.executeUpdate("DROP TABLE IF EXISTS buses CASCADE;");
             stmt.executeUpdate("CREATE TABLE buses (\n" +

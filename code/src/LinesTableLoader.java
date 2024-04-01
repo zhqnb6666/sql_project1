@@ -44,22 +44,13 @@ public class LinesTableLoader {
 
     public static void insertLines(Connection conn, String filePath) {
         try {
-            // Reads the entire JSON file content as a String
             String jsonStrings = Files.readString(Paths.get(filePath));
-            // Parses the String into a JSONObject with ordered fields
             JSONObject jsonObject = JSONObject.parseObject(jsonStrings, Feature.OrderedField);
-
-            // Prepare the SQL statement for inserting line data
             String insertSQL = "INSERT INTO lines (line_name, start_time, end_time, intro, mileage, color, first_opening, url) VALUES (?, TO_TIMESTAMP(?, 'HH24:MI'), TO_TIMESTAMP(?, 'HH24:MI'), ?, ?, ?, TO_DATE(?, 'YYYY-MM-DD'), ?);";
-            // Iterate through each key (line name) in the JSONObject
             for (String lineName : jsonObject.keySet()) {
                 JSONObject line = jsonObject.getJSONObject(lineName);
-
                 PreparedStatement pstmt = conn.prepareStatement(insertSQL);
-
-                // Set the parameters for the PreparedStatement from the JSON object
                 pstmt.setString(1, lineName); // Assuming lineName is the identifier
-                // Assuming your JSON has these fields and converting as necessary; adjust based on your actual structure
                 pstmt.setString(2, line.getString("start_time"));
                 pstmt.setString(3, line.getString("end_time"));
                 pstmt.setString(4, line.getString("intro"));
@@ -68,7 +59,6 @@ public class LinesTableLoader {
                 pstmt.setString(7, line.getString("first_opening"));
                 pstmt.setString(8, line.getString("url"));
 
-                // Execute the update
                 pstmt.executeUpdate();
             }
         } catch (IOException | SQLException e) {
