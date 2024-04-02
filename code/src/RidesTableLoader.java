@@ -86,7 +86,6 @@ public class RidesTableLoader {
                 pstmt.setBigDecimal(4, ride.getBigDecimal("price"));
                 pstmt.setString(5, ride.getString("start_time"));
                 pstmt.setString(6, ride.getString("end_time"));
-
                 pstmt.executeUpdate();
             }
         } catch (IOException | SQLException e) {

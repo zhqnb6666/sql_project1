@@ -47,24 +47,56 @@ public class Application {
             conn.setAutoCommit(false); // Start transaction
 
             String jsonDirectoryPath = "resources/";
+            long startTime, endTime ,totalTime = 0;
+            startTime = System.currentTimeMillis();
             LinesTableLoader.clearLinesTable(conn);
             StationsTableLoader.clearStationsTable(conn);
             StationsTableLoader.clearBusesTable(conn);
+            StationsTableLoader.clearOutsTable(conn);
             PassengersTableLoader.clearPassengersTable(conn);
             CardsTableLoader.clearCardsTable(conn);
             RidesTableLoader.clearRidesTable(conn);
             LineStationsTableLoader.clearLineStationsTable(conn);
+            endTime = System.currentTimeMillis();
+            System.out.println("Time for clear the tables" + (endTime - startTime) + "ms");
 
             // Insert data for each table from corresponding JSON files
+            startTime = System.currentTimeMillis();
             LinesTableLoader.insertLines(conn, jsonDirectoryPath + "lines.json");
-            StationsTableLoader.insertStationsAndBuses(conn, jsonDirectoryPath + "stations.json");
+            endTime = System.currentTimeMillis();
+            System.out.println("Time for insert lines" + (endTime - startTime) + "ms");
+
+            totalTime+=endTime-startTime;
+            startTime = System.currentTimeMillis();
+            StationsTableLoader.insertStationsAndBusesAndOuts(conn, jsonDirectoryPath + "stations.json");
+            endTime = System.currentTimeMillis();
+            System.out.println("Time for insert stations" + (endTime - startTime) + "ms");
+
+            totalTime+=endTime-startTime;
+            startTime = System.currentTimeMillis();
             PassengersTableLoader.insertPassengers(conn, jsonDirectoryPath + "passenger.json");
+            endTime = System.currentTimeMillis();
+            System.out.println("Time for insert passengers" + (endTime - startTime) + "ms");
+
+            totalTime+=endTime-startTime;
+            startTime = System.currentTimeMillis();
             CardsTableLoader.insertCards(conn, jsonDirectoryPath + "cards.json");
+            endTime = System.currentTimeMillis();
+            System.out.println("Time for insert cards" + (endTime - startTime) + "ms");
+
+            totalTime+=endTime-startTime;
+            startTime = System.currentTimeMillis();
             RidesTableLoader.insertRides(conn, jsonDirectoryPath + "ride.json");
+            endTime = System.currentTimeMillis();
+            System.out.println("Time for insert rides" + (endTime - startTime) + "ms");
+
+            totalTime+=endTime-startTime;
+            startTime = System.currentTimeMillis();
             LineStationsTableLoader.insertLineStations(conn,jsonDirectoryPath+"lines.json",jsonDirectoryPath+"stations.json");
-
+            endTime = System.currentTimeMillis();
+            System.out.println("Time for insert line stations" + (endTime - startTime) + "ms");
+            System.out.println("Total time for insert all tables" + totalTime + "ms");
             conn.commit(); // Commit transaction
-
             System.out.println("Data successfully loaded into the database.");
 
         } catch (SQLException e) {
@@ -89,4 +121,5 @@ public class Application {
             }
         }
     }
+
 }

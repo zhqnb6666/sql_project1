@@ -37,6 +37,18 @@ public class StationsTableLoader {
         }
     }
 
+    public static void clearOutsTable(Connection con)throws SQLException{
+        try(Statement stmt = con.createStatement()){
+            stmt.executeUpdate("DROP TABLE IF EXISTS outs CASCADE;");
+            stmt.executeUpdate("CREATE TABLE outs (\n" +
+                    "out_id SERIAL PRIMARY KEY,\n" +
+                    "station_id INTEGER NOT NULL REFERENCES stations(station_id),\n" +
+                    "out_name VARCHAR(255),\n" +
+                    "out_info TEXT\n" +
+                    ");");
+        }
+    }
+
     public static void clearBusesTable(Connection con) throws SQLException {
         try (Statement stmt = con.createStatement()) {
             stmt.executeUpdate("DROP TABLE IF EXISTS buses CASCADE;");
@@ -50,13 +62,14 @@ public class StationsTableLoader {
         }
     }
 
-    public static void insertStationsAndBuses(Connection conn, String filePath) {
+    public static void insertStationsAndBusesAndOuts(Connection conn, String filePath) {
         try {
             String jsonStrings = Files.readString(Paths.get(filePath));
             JSONObject jsonObject = JSON.parseObject(jsonStrings, Feature.OrderedField);
 
             String stationInsertSQL = "INSERT INTO stations (station_english_name, district, intro, chinese_name) VALUES (?, ?, ?, ?) RETURNING station_id;";
             String busInsertSQL = "INSERT INTO buses (station_id, bus_name, bus_info, chukou) VALUES (?, ?, ?, ?);";
+            String outInsertSQL = "INSERT INTO outs (station_id, out_name, out_info) VALUES (?, ?, ?);";
 
             for (String stationName : jsonObject.keySet()) {
                 JSONObject station = jsonObject.getJSONObject(stationName);
@@ -90,6 +103,15 @@ public class StationsTableLoader {
                                 busPstmt.setString(4, busInfo.getString("chukou"));
                                 busPstmt.executeUpdate();
                             }
+                        }
+                        JSONArray outInfos = station.getJSONArray("out_info");
+                        for (int i = 0; i < outInfos.size(); i++) {
+                            JSONObject outInfo = outInfos.getJSONObject(i);
+                            PreparedStatement outPstmt = conn.prepareStatement(outInsertSQL);
+                            outPstmt.setLong(1, stationId);
+                            outPstmt.setString(2, outInfo.getString("outt"));
+                            outPstmt.setString(3, outInfo.getString("textt"));
+                            outPstmt.executeUpdate();
                         }
                     } else {
                         throw new SQLException("Creating station failed, no ID obtained.");
